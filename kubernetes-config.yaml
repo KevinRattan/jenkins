@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-ui
+  labels:
+    app: demo-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-ui
+  template:
+    metadata:
+      labels:
+        app: demo-ui
+    spec:
+      containers:
+      - name: demo-ui
+        image: gcr.io/kube-onboard/startpointclient:v0.4
+        env:
+        - name: SERVER
+          value: "http://demo-service:8082"
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: demo-ui-service
+spec: 
+  ports: 
+     -  port: 80
+        protocol: TCP
+        targetPort: 8080
+  selector: 
+    app: demo-ui
+  type: LoadBalancer
+        
+
